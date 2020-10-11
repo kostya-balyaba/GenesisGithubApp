@@ -21,7 +21,8 @@ class RepositoryDtoToDomainMapper @Inject constructor() : Mapper<RepositoryDto, 
                 url,
                 stars,
                 forks,
-                language
+                language,
+                owner?.avatarUrl
             )
         }
 }

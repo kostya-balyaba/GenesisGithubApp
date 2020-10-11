@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.balyaba.genesisgithubapp.features.repositories.RepositoriesFragment"
-        android:label="@string/title_home"
+        android:label="@string/title_repositories"
         tools:layout="@layout/fragment_repositories" />
 
     <fragment

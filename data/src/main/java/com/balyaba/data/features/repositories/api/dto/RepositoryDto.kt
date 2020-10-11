@@ -13,7 +13,8 @@ data class RepositoryDto(
     @SerializedName("fullName") val fullName: String?,
     @SerializedName("description") val description: String?,
     @SerializedName("url") val url: String?,
-    @SerializedName("stars") val stars: Int?,
+    @SerializedName("stargazers_count") val stars: Int?,
     @SerializedName("forks") val forks: Int?,
-    @SerializedName("language") val language: String?
+    @SerializedName("language") val language: String?,
+    @SerializedName("owner") val owner: Owner?
 )

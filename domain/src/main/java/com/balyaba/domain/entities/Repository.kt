@@ -13,5 +13,6 @@ data class Repository(
     val url: String?,
     val stars: Int?,
     val forks: Int?,
-    val language: String?
+    val language: String?,
+    val ownerAvatarUrl: String?
 )
