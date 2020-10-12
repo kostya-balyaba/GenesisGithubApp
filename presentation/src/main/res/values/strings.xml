@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">GenesisGithubApp</string>
     <string name="title_repositories">Repositories</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="title_about">About</string>
     <string name="search_empty_title_text">Sorry, nothing was found for your search. Please try another query.</string>
+    <string name="favorites_empty">You have not added anything to your favorites yet</string>
     <string name="photos_general_error_title">Oops!…</string>
     <string name="photos_general_error_text">Something went wrong. Please try again later.</string>
     <string name="search">Search…</string>

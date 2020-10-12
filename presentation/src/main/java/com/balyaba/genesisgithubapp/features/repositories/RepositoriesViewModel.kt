@@ -1,25 +1,41 @@
 package com.balyaba.genesisgithubapp.features.repositories
 
+import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.balyaba.data.features.repositories.api.dto.NetworkState
+import com.balyaba.domain.entities.Repository
+import com.balyaba.domain.usecases.GetFavoritesUseCase
 import com.balyaba.domain.usecases.GetRepositoriesUseCase
+import com.balyaba.domain.usecases.RemoveFromFavoritesUseCase
+import com.balyaba.domain.usecases.SetFavoriteUseCase
 import com.balyaba.genesisgithubapp.common.vm.BaseViewModel
+import com.balyaba.genesisgithubapp.features.repositories.adapter.RepositoriesAdapter
 import com.balyaba.genesisgithubapp.features.repositories.adapter.datasource.AdapterDataSourceCallback
 import com.balyaba.genesisgithubapp.features.repositories.adapter.datasource.AdapterDataSourceFactory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class RepositoriesViewModel @Inject constructor(
-    private val getRepositoriesUseCase: GetRepositoriesUseCase
+    private val getRepositoriesUseCase: GetRepositoriesUseCase,
+    private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val setFavoriteUseCase: SetFavoriteUseCase,
+    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase
 ) : BaseViewModel<RepositoriesViewState, RepositoriesViewEffect, RepositoriesViewEvent>(),
     AdapterDataSourceCallback {
 
     private val repositoriesDataSource =
-        AdapterDataSourceFactory(getRepositoriesUseCase, viewModelScope, stateCallback = this)
+        AdapterDataSourceFactory(
+            getRepositoriesUseCase,
+            getFavoritesUseCase,
+            viewModelScope,
+            stateCallback = this
+        )
 
     private var startQueryJob: Job? = null
 
@@ -31,9 +47,27 @@ class RepositoriesViewModel @Inject constructor(
 
     override fun processEvent(viewEvent: RepositoriesViewEvent) {
         when (viewEvent) {
-            is RepositoriesViewEvent.OnSearchRequest -> {
+            is RepositoriesViewEvent.OnSearchRequestEvent -> {
                 startSearchQuery(viewEvent.query)
             }
+        }
+    }
+
+    val adapterListener = object : RepositoriesAdapter.OnItemClickListener {
+        override fun onRepositoryClick(repository: Repository) {
+            repository.url?.let { url ->
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                viewEffect = RepositoriesViewEffect.OnOpenLink(intent)
+            }
+        }
+
+        override fun onFavoriteClick(repository: Repository, position: Int) {
+            if (repository.isFavorite)
+                removeFromFavorites(repository)
+            else
+                addInFavorites(repository)
+            repository.isFavorite = repository.isFavorite.not()
+            viewEffect = RepositoriesViewEffect.UpdateRepositoryByPosition(position)
         }
     }
 
@@ -56,6 +90,18 @@ class RepositoriesViewModel @Inject constructor(
         startQueryJob = viewModelScope.launch {
             delay(SEARCH_REQUEST_DELAY)
             repositoriesDataSource.updateQuery(query.trim())
+        }
+    }
+
+    private fun addInFavorites(repository: Repository) {
+        viewModelScope.launch(Dispatchers.IO) {
+            setFavoriteUseCase.addInFavorites(repository)
+        }
+    }
+
+    private fun removeFromFavorites(repository: Repository) {
+        viewModelScope.launch(Dispatchers.IO) {
+            removeFromFavoritesUseCase.remove(repository)
         }
     }
 

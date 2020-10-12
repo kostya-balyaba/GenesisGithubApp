@@ -93,17 +93,26 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.21" />
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/isFavoriteIconView"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_margin="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_not_favorite"
+            app:tint="@color/colorAccent" />
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/titleTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
             android:padding="8dp"
             android:textAlignment="center"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/isFavoriteIconView"
             app:layout_constraintStart_toStartOf="@+id/guideline"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Title" />

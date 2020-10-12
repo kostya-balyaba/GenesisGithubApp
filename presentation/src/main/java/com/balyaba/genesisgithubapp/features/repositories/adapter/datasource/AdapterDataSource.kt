@@ -3,11 +3,9 @@ package com.balyaba.genesisgithubapp.features.repositories.adapter.datasource
 import androidx.paging.PageKeyedDataSource
 import com.balyaba.data.features.repositories.api.dto.NetworkState
 import com.balyaba.domain.entities.Repository
+import com.balyaba.domain.usecases.GetFavoritesUseCase
 import com.balyaba.domain.usecases.GetRepositoriesUseCase
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 
 /**
@@ -16,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class AdapterDataSource(
     private val getRepositoriesUseCase: GetRepositoriesUseCase,
+    private val getFavoritesUseCase: GetFavoritesUseCase,
     private val coroutineScope: CoroutineScope,
     private val query: String,
     private val stateCallback: AdapterDataSourceCallback
@@ -54,8 +53,18 @@ class AdapterDataSource(
 
             resultList.addAll(first.await())
             resultList.addAll(second.await())
-            stateCallback.processNetworkState(NetworkState.SUCCESS)
 
+            withContext(Dispatchers.IO) {
+                val favoritesRepositories = getFavoritesUseCase.getFavorites()
+                resultList.forEach { repository ->
+                    favoritesRepositories.forEach {
+                        if (repository.id == it.id)
+                            repository.isFavorite = true
+                    }
+                }
+            }
+
+            stateCallback.processNetworkState(NetworkState.SUCCESS)
             callback(resultList)
         }
     }

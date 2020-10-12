@@ -14,5 +14,6 @@ data class Repository(
     val stars: Int?,
     val forks: Int?,
     val language: String?,
-    val ownerAvatarUrl: String?
+    val ownerAvatarUrl: String?,
+    var isFavorite: Boolean = false
 )

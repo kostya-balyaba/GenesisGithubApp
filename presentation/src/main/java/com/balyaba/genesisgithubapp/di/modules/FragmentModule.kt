@@ -1,5 +1,6 @@
 package com.balyaba.genesisgithubapp.di.modules
 
+import com.balyaba.genesisgithubapp.features.favorites.FavoritesFragment
 import com.balyaba.genesisgithubapp.features.repositories.RepositoriesFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -13,4 +14,7 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract fun bindRepositoriesListFragment(): RepositoriesFragment
+
+    @ContributesAndroidInjector
+    abstract fun bindFavoritesFragment(): FavoritesFragment
 }

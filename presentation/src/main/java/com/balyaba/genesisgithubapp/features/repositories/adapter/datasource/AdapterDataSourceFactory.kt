@@ -3,6 +3,7 @@ package com.balyaba.genesisgithubapp.features.repositories.adapter.datasource
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.balyaba.domain.entities.Repository
+import com.balyaba.domain.usecases.GetFavoritesUseCase
 import com.balyaba.domain.usecases.GetRepositoriesUseCase
 import kotlinx.coroutines.CoroutineScope
 
@@ -13,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 
 class AdapterDataSourceFactory(
     private val getRepositoriesUseCase: GetRepositoriesUseCase,
+    private val getFavoritesUseCase: GetFavoritesUseCase,
     private val coroutineScope: CoroutineScope,
     private var query: String = "",
     private val stateCallback: AdapterDataSourceCallback
@@ -21,7 +23,7 @@ class AdapterDataSourceFactory(
     private val source = MutableLiveData<AdapterDataSource>()
 
     override fun create(): DataSource<Int, Repository> {
-        val source = AdapterDataSource(getRepositoriesUseCase, coroutineScope, query, stateCallback)
+        val source = AdapterDataSource(getRepositoriesUseCase, getFavoritesUseCase, coroutineScope, query, stateCallback)
         this.source.postValue(source)
         return source
     }

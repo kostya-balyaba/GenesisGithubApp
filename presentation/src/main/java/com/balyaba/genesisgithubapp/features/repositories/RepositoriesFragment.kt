@@ -1,14 +1,12 @@
 package com.balyaba.genesisgithubapp.features.repositories
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.balyaba.domain.entities.Repository
+import androidx.lifecycle.observe
 import com.balyaba.genesisgithubapp.R
 import com.balyaba.genesisgithubapp.common.ui.hide
 import com.balyaba.genesisgithubapp.common.ui.onQueryTextChange
@@ -57,24 +55,15 @@ class RepositoriesFragment : Fragment() {
         val searchView = searchMenuItem.actionView as SearchView
         searchView.onQueryTextChange {
             if (it.isNotEmpty() && it.length > 2) {
-                viewModel.processEvent(RepositoriesViewEvent.OnSearchRequest(it))
+                viewModel.processEvent(RepositoriesViewEvent.OnSearchRequestEvent(it))
             }
         }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    private val adapterListener = object : RepositoriesAdapter.OnItemClickListener {
-        override fun onRepositoryClick(repository: Repository) {
-            repository.url?.let { url ->
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                startActivity(intent)
-            }
-        }
-    }
-
     private fun initUI() {
         recyclerView.adapter = adapter
-        adapter.listener = adapterListener
+        adapter.listener = viewModel.adapterListener
     }
 
     private fun setupObserver() {
@@ -83,10 +72,19 @@ class RepositoriesFragment : Fragment() {
         })
         viewModel.viewState().observe(viewLifecycleOwner, {
             when (it.status) {
-                is Status.Loading -> showLoadingState()
+                is Status.Loading -> {
+                    if (adapter.currentList?.isEmpty() != false)
+                        showLoadingState()
+                }
                 is Status.Success -> showSuccessState()
                 is Status.Empty -> showEmptyState()
                 is Status.Error -> showErrorState()
+            }
+        })
+        viewModel.viewEffects().observe(viewLifecycleOwner, {
+            when (it) {
+                is RepositoriesViewEffect.OnOpenLink -> startActivity(it.intent)
+                is RepositoriesViewEffect.UpdateRepositoryByPosition -> adapter.notifyItemChanged(it.position)
             }
         })
     }

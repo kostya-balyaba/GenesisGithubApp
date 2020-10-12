@@ -1,7 +1,7 @@
 package com.balyaba.data.features.repositories.datasource
 
 import com.balyaba.data.db.GithubDao
-import com.balyaba.data.features.repositories.api.dto.RepositoryDto
+import com.balyaba.data.features.repositories.local.dto.RepositoryCacheDto
 import javax.inject.Inject
 
 
@@ -11,4 +11,15 @@ import javax.inject.Inject
 
 class GithubLocalDataSourceImpl @Inject constructor(
     private val githubDao: GithubDao
-) : GithubLocalDataSource
+) : GithubLocalDataSource {
+
+    override suspend fun addInFavorites(repository: RepositoryCacheDto) {
+        githubDao.addInFavorites(repository)
+    }
+
+    override suspend fun getFavorites(): List<RepositoryCacheDto> = githubDao.getFavorites()
+
+    override suspend fun removeFromFavorites(id: Long) {
+        githubDao.removeFromFavorites(id)
+    }
+}

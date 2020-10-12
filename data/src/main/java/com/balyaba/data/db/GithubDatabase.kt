@@ -2,7 +2,7 @@ package com.balyaba.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.balyaba.data.features.repositories.cache.dto.RepositoryCacheDto
+import com.balyaba.data.features.repositories.local.dto.RepositoryCacheDto
 
 
 /**

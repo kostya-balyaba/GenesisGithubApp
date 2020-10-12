@@ -1,4 +1,4 @@
-package com.balyaba.data.features.repositories.cache.dto
+package com.balyaba.data.features.repositories.local.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -18,5 +18,7 @@ data class RepositoryCacheDto(
     val url: String?,
     val stars: Int?,
     val forks: Int?,
-    val language: String?
+    val language: String?,
+    val ownerAvatarUrl: String?,
+    var isFavorite: Boolean = false
 )

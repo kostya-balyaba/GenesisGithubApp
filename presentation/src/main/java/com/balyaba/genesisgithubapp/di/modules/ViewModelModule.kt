@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.balyaba.genesisgithubapp.common.vm.ViewModelFactory
 import com.balyaba.genesisgithubapp.common.vm.VmKey
+import com.balyaba.genesisgithubapp.features.favorites.FavoritesViewModel
 import com.balyaba.genesisgithubapp.features.repositories.RepositoriesViewModel
 
 import dagger.Binds
@@ -20,4 +21,9 @@ abstract class ViewModelModule {
     @IntoMap
     @VmKey(RepositoriesViewModel::class)
     abstract fun bindRepositoriesViewModel(viewModel: RepositoriesViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @VmKey(FavoritesViewModel::class)
+    abstract fun bindFavoritesViewModel(viewModel: FavoritesViewModel): ViewModel
 }

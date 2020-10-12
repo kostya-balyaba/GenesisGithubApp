@@ -1,10 +1,8 @@
-package com.balyaba.genesisgithubapp.features.repositories.adapter
+package com.balyaba.genesisgithubapp.features.favorites.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.balyaba.domain.entities.Repository
 import com.balyaba.genesisgithubapp.R
@@ -15,12 +13,19 @@ import kotlinx.android.synthetic.main.item_list_repository.view.*
 
 
 /**
- * Created by Baliaba Konstantin on 10.10.2020
+ * Created by Baliaba Konstantin on 11.10.2020
  */
 
-class RepositoriesAdapter : PagedListAdapter<Repository, RecyclerView.ViewHolder>(diffCallback) {
+class FavoritesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private val repositories: MutableList<Repository> = mutableListOf()
     var listener: OnItemClickListener? = null
+
+    fun replaceItems(newItemsList: List<Repository>) {
+        repositories.clear()
+        repositories.addAll(newItemsList)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -29,19 +34,26 @@ class RepositoriesAdapter : PagedListAdapter<Repository, RecyclerView.ViewHolder
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as RepositoryViewHolder).bind(getItem(position) as Repository)
+        (holder as RepositoryViewHolder).bind(repositories[position])
+    }
+
+    override fun getItemCount(): Int = repositories.size
+
+    fun removeItemByPosition(position: Int) {
+        repositories.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     inner class RepositoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         init {
             itemView.setOnClickListener {
-                listener?.onRepositoryClick(getItem(adapterPosition) as Repository)
+                listener?.onRepositoryClick(repositories[adapterPosition])
             }
             with(itemView) {
                 isFavoriteIconView.setOnClickListener {
                     listener?.onFavoriteClick(
-                        getItem(adapterPosition) as Repository,
+                        repositories[adapterPosition],
                         adapterPosition
                     )
                 }
@@ -74,16 +86,6 @@ class RepositoriesAdapter : PagedListAdapter<Repository, RecyclerView.ViewHolder
                     else R.drawable.ic_not_favorite
                 )
             }
-        }
-    }
-
-    companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<Repository>() {
-            override fun areItemsTheSame(oldItem: Repository, newItem: Repository): Boolean =
-                oldItem == newItem
-
-            override fun areContentsTheSame(oldItem: Repository, newItem: Repository): Boolean =
-                oldItem == newItem
         }
     }
 
