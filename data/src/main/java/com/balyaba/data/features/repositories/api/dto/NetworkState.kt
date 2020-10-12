@@ -7,6 +7,7 @@ package com.balyaba.data.features.repositories.api.dto
 
 enum class NetworkState {
     LOADING,
-    SUCCESS,
+    SUCCESS_LOADED,
+    SUCCESS_EMPTY,
     ERROR
 }

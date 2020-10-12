@@ -24,9 +24,12 @@ class AdapterDataSource(
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, Repository>
     ) {
-        executeQuery(1, params.requestedLoadSize) {
-            callback.onResult(it, null, 3)
-        }
+        if (query.isEmpty())
+            stateCallback.processNetworkState(NetworkState.SUCCESS_EMPTY)
+        else
+            executeQuery(1, params.requestedLoadSize) {
+                callback.onResult(it, null, 3)
+            }
     }
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, Repository>) {
@@ -64,7 +67,11 @@ class AdapterDataSource(
                 }
             }
 
-            stateCallback.processNetworkState(NetworkState.SUCCESS)
+            if (resultList.isEmpty())
+                stateCallback.processNetworkState(NetworkState.SUCCESS_EMPTY)
+            else
+                stateCallback.processNetworkState(NetworkState.SUCCESS_LOADED)
+
             callback(resultList)
         }
     }

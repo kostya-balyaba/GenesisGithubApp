@@ -2,6 +2,8 @@ package com.balyaba.genesisgithubapp.features.repositories
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -24,6 +26,9 @@ class RepositoriesFragment : Fragment() {
     lateinit var viewModel: RepositoriesViewModel
 
     private val adapter: RepositoriesAdapter by lazy { RepositoriesAdapter() }
+
+    private var searchMenuItem: MenuItem? = null
+    private var searchView: SearchView? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -51,14 +56,20 @@ class RepositoriesFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        val searchMenuItem = menu.findItem(R.id.action_search)
-        val searchView = searchMenuItem.actionView as SearchView
-        searchView.onQueryTextChange {
+        searchMenuItem = menu.findItem(R.id.action_search)
+        searchView = searchMenuItem?.actionView as SearchView
+        initLastQuery()
+        searchView?.onQueryTextChange {
             if (it.isNotEmpty() && it.length > 2) {
                 viewModel.processEvent(RepositoriesViewEvent.OnSearchRequestEvent(it))
             }
         }
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        searchMenuItem?.collapseActionView()
     }
 
     private fun initUI() {
@@ -87,6 +98,16 @@ class RepositoriesFragment : Fragment() {
                 is RepositoriesViewEffect.UpdateRepositoryByPosition -> adapter.notifyItemChanged(it.position)
             }
         })
+    }
+
+    private fun initLastQuery() {
+        if (viewModel.lastQuery.isNotEmpty()) {
+            Handler(Looper.getMainLooper()).post {
+                searchMenuItem?.expandActionView()
+                searchView?.setQuery(viewModel.lastQuery, false)
+                searchView?.clearFocus()
+            }
+        }
     }
 
     private fun showLoadingState() {

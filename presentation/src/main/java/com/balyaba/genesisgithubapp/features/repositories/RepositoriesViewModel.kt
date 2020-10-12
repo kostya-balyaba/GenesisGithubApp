@@ -40,6 +40,7 @@ class RepositoriesViewModel @Inject constructor(
     private var startQueryJob: Job? = null
 
     val repositories = LivePagedListBuilder(repositoriesDataSource, pagedListConfig()).build()
+    var lastQuery: String = ""
 
     init {
         viewState = RepositoriesViewState(Status.Loading)
@@ -76,8 +77,11 @@ class RepositoriesViewModel @Inject constructor(
             NetworkState.LOADING -> {
                 viewState.copy(status = Status.Loading)
             }
-            NetworkState.SUCCESS -> {
+            NetworkState.SUCCESS_LOADED -> {
                 viewState.copy(status = Status.Success)
+            }
+            NetworkState.SUCCESS_EMPTY -> {
+                viewState.copy(status = Status.Empty)
             }
             NetworkState.ERROR -> {
                 viewState.copy(status = Status.Error)
@@ -86,9 +90,12 @@ class RepositoriesViewModel @Inject constructor(
     }
 
     private fun startSearchQuery(query: String) {
+        if (query == lastQuery)
+            return
         startQueryJob?.cancel()
         startQueryJob = viewModelScope.launch {
             delay(SEARCH_REQUEST_DELAY)
+            lastQuery = query
             repositoriesDataSource.updateQuery(query.trim())
         }
     }
